@@ -6,9 +6,14 @@ import { decryptData } from "../utils/encryptData";
 const useApi = () => {
   // Variables
   const [data, setData] = useState("");
+
+  // Array of messages
   const [chatMessage, setChatMessage] = useState([]);
+
   const [error, setError] = useState();
   const [loading, setLoading] = useState(false);
+
+  // SetUploading is not utilized
   const [uploading, setUploading] = useState(false);
   const OPEN_AI_API_KEY = () =>
     decryptData(localStorage.getItem("icp-dai-open-ai"));
@@ -50,6 +55,7 @@ const useApi = () => {
       // Send error message
       if (response.status !== 200) {
         const message = result.error.message;
+        // I think the loading must be set to false here
         toast.error(message);
         throw new Error(message);
       }
@@ -59,10 +65,16 @@ const useApi = () => {
         content: assistantContent,
         role: "assistant",
       };
+
+      // Update the chat message state variable to include the new message into the array
       setChatMessage((prev) => [...prev, messageToSaveFromAssistant]);
       await addMessageToConversation(messageToSaveFromAssistant);
+
+      // Content of the return data from the server
       setData(assistantContent);
       setError(null);
+
+      // Turn off loading
       setLoading(false);
     } catch (error) {
         setLoading(false);
@@ -76,6 +88,7 @@ const useApi = () => {
     error,
     loading,
     chatCompletion,
+    // Uploading only referenced here
     uploading,
     setData,
     chatMessage,
