@@ -1,13 +1,14 @@
 import { StableBTreeMap, Server } from "azle";
 import { v4 as uuidv4 } from "uuid";
+
+// First greeting message to the user
 import { systemMessage } from "./utils/ai";
 import express, { Request, Response } from "express";
 import cors from "cors";
 
-/**
- * Message record
- */
+
 type Message = {
+  // System or user
   role: string;
   content: string;
   // UUID
@@ -20,9 +21,6 @@ type BaseMessage = {
   content: string;
 };
 
-// Create a new conversation
-type ConversationPayload = { userIdentity: string };
-
 // Un used
 // Add a message to conversation
 type AddMessgeToConversationPayload = {
@@ -30,6 +28,9 @@ type AddMessgeToConversationPayload = {
   conversationId: string;
   message: BaseMessage;
 };
+
+// Create a new conversation
+type ConversationPayload = { userIdentity: string };
 
 type Conversation = {
   // UUID
@@ -49,7 +50,7 @@ export default Server(() => {
   app.use(express.json());
   app.use(cors());
 
-  // Create a new conversation
+  // Create a new conversation -> Shouldn't this be post???
   app.put("/conversation", (req: Request, res: Response) => {
 
     // Requires the identity of the user
@@ -58,7 +59,8 @@ export default Server(() => {
       return res.status(400).json({ message: "Invalid conversation payload" });
     }
 
-    // The first of the conversation is the bot greeting the user
+    // The first message of the conversation is the bot greeting the user
+    // It contains role and content, only add the unique id
     const message = { ...systemMessage, id: uuidv4() };
     const conversation = { id: uuidv4(), conversation: [message] };
     userConversation.insert(conversationPayload.userIdentity, conversation);
